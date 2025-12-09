@@ -1,6 +1,11 @@
 import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI;
+// Clean and validate MongoDB URI
+const MONGODB_URI = process.env.MONGODB_URI?.trim().replace(/\s+/g, '');
+
+if (!MONGODB_URI) {
+  throw new Error('Please define MONGODB_URI environment variable');
+}
 
 // Cache the database connection
 let cachedDb = null;
@@ -24,16 +29,22 @@ const itemSchema = new mongoose.Schema({
 const Item = mongoose.models.Item || mongoose.model('Item', itemSchema);
 
 async function connectDB() {
-  if (cachedDb) {
+  if (cachedDb && mongoose.connection.readyState === 1) {
     return cachedDb;
   }
 
-  const db = await mongoose.connect(MONGODB_URI, {
-    bufferCommands: false,
-  });
+  try {
+    const db = await mongoose.connect(MONGODB_URI, {
+      bufferCommands: false,
+      serverSelectionTimeoutMS: 5000,
+    });
 
-  cachedDb = db;
-  return db;
+    cachedDb = db;
+    return db;
+  } catch (error) {
+    console.error('MongoDB connection error:', error.message);
+    throw new Error(`Database connection failed: ${error.message}`);
+  }
 }
 
 export default async function handler(req, res) {
