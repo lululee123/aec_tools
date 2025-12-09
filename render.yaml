@@ -1,0 +1,31 @@
+services:
+  # Backend API
+  - type: web
+    name: aec-tools-backend
+    runtime: node
+    env: node
+    buildCommand: cd backend && yarn install
+    startCommand: cd backend && yarn start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: MONGODB_URI
+        sync: false
+    healthCheckPath: /api/hello
+
+  # Frontend
+  - type: web
+    name: aec-tools-frontend
+    runtime: static
+    buildCommand: cd frontend && yarn install && yarn build
+    staticPublishPath: frontend/dist
+    routes:
+      - type: rewrite
+        source: /api/*
+        destination: https://aec-tools-backend.onrender.com/api/*
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=3600

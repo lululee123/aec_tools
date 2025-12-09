@@ -1,0 +1,21 @@
+{
+  "name": "aec-tools",
+  "version": "1.0.0",
+  "description": "Simple webpage with React frontend and Express backend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"yarn dev:frontend\" \"yarn dev:backend\"",
+    "dev:frontend": "cd frontend && yarn dev",
+    "dev:backend": "cd backend && yarn dev",
+    "build": "cd frontend && yarn install && yarn build",
+    "vercel-build": "cd frontend && yarn install && yarn build"
+  },
+  "dependencies": {
+    "mongoose": "^8.0.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "packageManager": "yarn@4.0.2"
+}
